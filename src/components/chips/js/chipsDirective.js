@@ -75,6 +75,8 @@
    *    the delete key will remove the chip.
    * @param {string=} delete-button-label A label for the delete button. Also hidden and read by
    *    screen readers.
+   * @param {string=} aria-label An accessibility label for the input if no placeholder
+   *    is present. A warning will be logged to the console if neither attribute is provided.
    *
    * @usage
    * <hljs lang="html">
@@ -99,7 +101,6 @@
             ng-class="{\'md-focused\': $mdChipsCtrl.selectedChip == $index}">\
           <div class="md-chip-content"\
               tabindex="-1"\
-              aria-hidden="true"\
               ng-focus="!$mdChipsCtrl.readonly && $mdChipsCtrl.selectChip($index)"\
               md-chip-transclude="$mdChipsCtrl.chipContentsTemplate"></div>\
           <div class="md-chip-remove-container"\
@@ -115,7 +116,7 @@
         <input\
             tabindex="0"\
             placeholder="{{$mdChipsCtrl.getPlaceholder()}}"\
-            aria-label="{{$mdChipsCtrl.getPlaceholder()}}"\
+            aria-label="{{$mdChipsCtrl.getInputLabel()}}"\
             ng-model="$mdChipsCtrl.chipBuffer"\
             ng-focus="$mdChipsCtrl.onInputFocus()"\
             ng-blur="$mdChipsCtrl.onInputBlur()"\
@@ -141,7 +142,7 @@
   /**
    * MDChips Directive Definition
    */
-  function MdChips ($mdTheming, $mdUtil, $compile, $log, $timeout) {
+  function MdChips ($mdTheming, $mdUtil, $mdAria, $compile, $log, $timeout) {
     return {
       template: function(element, attrs) {
         // Clone the element into an attribute. By prepending the attribute
@@ -235,7 +236,7 @@
         mdChipsCtrl.chipInputTemplate    = chipInputTemplate;
 
         element
-            .attr({ ariaHidden: true, tabindex: -1 })
+            .attr('tabIndex', -1 )
             .on('focus', function () { mdChipsCtrl.onFocus(); });
 
         if (attr.ngModel) {
@@ -244,7 +245,6 @@
           // If an `md-on-append` attribute was set, tell the controller to use the expression
           // when appending chips.
           if (attrs.mdOnAppend) mdChipsCtrl.useMdOnAppendExpression();
-
           // The md-autocomplete and input elements won't be compiled until after this directive
           // is complete (due to their nested nature). Wait a tick before looking for them to
           // configure the controller.

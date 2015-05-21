@@ -13,12 +13,15 @@ angular
  * @param $element
  * @constructor
  */
-function MdChipsCtrl ($scope, $mdConstant, $log, $element, $timeout) {
+function MdChipsCtrl ($scope, $mdConstant, $log, $element, $timeout, $mdAria) {
   /** @type {$timeout} **/
   this.$timeout = $timeout;
 
   /** @type {Object} */
   this.$mdConstant = $mdConstant;
+
+  /** @type {Object} */
+  this.$mdAria = $mdAria;
 
   /** @type {angular.$scope} */
   this.$scope = $scope;
@@ -340,6 +343,38 @@ MdChipsCtrl.prototype.configureUserInput = function(inputElement) {
       .on('keydown', function(event) { scope.$apply( angular.bind(ctrl, function() { ctrl.inputKeydown(event); })) })
       .on('focus', angular.bind(ctrl, ctrl.onInputFocus))
       .on('blur', angular.bind(ctrl, ctrl.onInputBlur));
+
+  // this.configureInputLabel();
+};
+/**
+ * Require aria-label on input element.
+ * @param inputElement
+ */
+MdChipsCtrl.prototype.configureInputLabel = function() {
+  var inputElement = this.$element.find('input');
+  var placeholderText = this.$element.attr('placeholder') || inputElement.attr('placeholder');
+
+  var attrName = 'aria-label',
+      parentNode = this.$element[0];
+  // warn if parent is missing placeholder AND ariaLabel
+  // warn if input is missing ariaLabel (developer can only impact if manually supplied)
+  console.log(parentNode);
+  placeholderText = angular.isString(placeholderText) ? placeholderText.trim() : '';
+
+  if (!placeholderText || (!parentNode.hasAttribute(attrName) || parentNode.getAttribute(attrName).length === 0)) {
+
+      if (!inputElement[0].hasAttribute(attrName)) {
+        inputElement.attr(attrName, placeholderText);
+      } else {
+        console.warn('ARIA: Attribute "', attrName, '", required for accessibility, is missing on parent node:', parentNode);
+      }
+
+    }
+};
+
+MdChipsCtrl.prototype.getInputLabel = function() {
+  var inputElement = this.$element.find('input');
+  this.$mdAria.expect(inputElement, 'aria-label', this.getPlaceholder());
 };
 
 MdChipsCtrl.prototype.configureAutocomplete = function(ctrl) {

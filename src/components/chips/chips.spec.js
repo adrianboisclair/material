@@ -21,6 +21,15 @@ describe('<md-chips>', function() {
       expect(input.length).toBe(1);
     });
 
+    it('should label the input element from placeholder', inject(function($timeout) {
+      var element = buildChips('<md-chips ng-model="items" placeholder="To"></md-chips>');
+      var ctrl = element.controller('mdChips');
+
+      var input = element.find('input');
+      $timeout.flush();
+      expect(input.attr('aria-label')).toBe('To');
+    }));
+
     it('should render a list of chips', function() {
       var element = buildChips(BASIC_CHIP_TEMPLATE);
 
@@ -140,7 +149,8 @@ describe('<md-chips>', function() {
               md-selected-item="selectedItem"\
               md-search-text="searchText"\
               md-items="item in querySearch(searchText)"\
-              md-item-text="item">\
+              md-item-text="item"\
+              placeholder="Label">\
             <span md-highlight-text="searchText">{{itemtype}}</span>\
           </md-autocomplete>\
         </md-chips>';
@@ -163,6 +173,14 @@ describe('<md-chips>', function() {
         expect(scope.items.length).toBe(4);
         expect(scope.items[3]).toBe('Kiwi');
       }));
+
+      it('should label the autocomplete input element from placeholder', inject(function($timeout) {
+        var element = buildChips(AUTOCOMPLETE_CHIPS_TEMPLATE);
+
+        var input = element.find('input');
+        $timeout.flush();
+        expect(input.attr('aria-label')).toBe('Label');
+      }));
     });
 
     describe('user input templates', function() {
@@ -172,8 +190,16 @@ describe('<md-chips>', function() {
           </md-chips>';
       var INPUT_TEMPLATE = '\
           <md-chips ng-model="items">\
-            <input type="text">\
+            <input type="text" placeholder="Label">\
           </md-chips>';
+
+      it('should label the custom input element from placeholder', inject(function($timeout) {
+        var element = buildChips(INPUT_TEMPLATE);
+
+        var input = element.find('input');
+        $timeout.flush();
+        expect(input.attr('aria-label')).toBe('Label');
+      }));
 
       describe('using ngModel', function() {
         it('should add the ngModelCtrl.$viewValue when <enter> is pressed',

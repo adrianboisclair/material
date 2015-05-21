@@ -42,6 +42,46 @@ describe('<md-contact-chips>', function() {
       expect(element.find('input')[0].placeholder).toBe('To');
     }));
 
+    iit('should create aria-label from placeholder', inject(function($timeout) {
+      var element = buildChips(CONTACT_CHIPS_TEMPLATE);
+      var ctrl = element.controller('mdContactChips');
+      $timeout.flush();
+      expect(element.find('input').attr('aria-label')).toBe('To');
+    }));
+
+    iit('should preserve aria-label', inject(function($timeout) {
+      var labelTemplate = '<md-contact-chips\
+                            ng-model="contacts"\
+                            md-contacts="querySearch($query)"\
+                            md-contact-name="name"\
+                            md-contact-image="image"\
+                            md-contact-email="email"\
+                            aria-label="Something else"\
+                            placeholder="To">\
+                        </md-contact-chips>';
+      var element = buildChips(labelTemplate);
+      var ctrl = element.controller('mdContactChips');
+      $timeout.flush();
+      expect(element.find('input').attr('aria-label')).toBe('Something else');
+    }));
+
+    it('should allow aria-labelledby', inject(function($timeout) {
+      var labelTemplate = '<md-contact-chips\
+                            ng-model="contacts"\
+                            md-contacts="querySearch($query)"\
+                            md-contact-name="name"\
+                            md-contact-image="image"\
+                            md-contact-email="email"\
+                            aria-labelledby="someElement"\
+                            placeholder="To">\
+                        </md-contact-chips>';
+      var element = buildChips(labelTemplate);
+      var ctrl = element.controller('mdContactChips');
+      $timeout.flush();
+      expect(element.find('input').attr('aria-labelledby')).toBe('To');
+      expect(element.find('input').attr('aria-label')).toBeUndefined();
+    }));
+
     describe('filtering selected items', function() {
       it('should filter', inject(function($timeout) {
         scope.querySearch = jasmine.createSpy('querySearch').and.callFake(function(q) {
